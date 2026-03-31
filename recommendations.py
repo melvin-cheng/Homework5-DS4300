@@ -1,10 +1,9 @@
 """
-Run the assignment recommendation query against Neo4j and print five songs.
+Execute the DS4300 Cypher for Prof. Rachlin: seeds = Strokes/Regina songs in the graph,
+one-hop SIMILAR_TO neighbors, exclude those artists, rank by max(edge score), top 5.
 
-Requires: Neo4j loaded via data_processing.py (with Song.album set — re-run loader
-if your graph was built before album was added).
+Requires: graph built by data_processing.py; NEO4J_* in .env. Run: `python recommendations.py`
 """
-
 import os
 
 from dotenv import load_dotenv
@@ -16,6 +15,7 @@ NEO4J_URI = os.getenv("NEO4J_URI", "neo4j://127.0.0.1:7687")
 NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
 
+# max(r.score): best similarity to any seed song; LIMIT 5 = assignment requirement.
 RECOMMEND_QUERY = """
 MATCH (seed:Song)
 WHERE toLower(seed.artists) CONTAINS 'the strokes'
@@ -37,6 +37,7 @@ ORDER BY score DESC
 LIMIT 5
 """
 
+# SIMILAR_TO is stored twice per pair (bidirectional); /2 = unique undirected edges for reporting.
 GRAPH_STATS_QUERY = """
 MATCH (s:Song) WITH count(s) AS songCount
 MATCH ()-[r:SIMILAR_TO]->() WITH songCount, count(r) AS relCount

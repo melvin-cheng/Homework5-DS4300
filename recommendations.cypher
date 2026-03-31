@@ -1,9 +1,4 @@
-// DS4300 — Five song recommendations (Prof. Rachlin: likes The Strokes + Regina Spektor)
-//
-// Model: (:Song)-[:SIMILAR_TO {score}]->(:Song); seed = songs whose artists match;
-// score = max similarity to any seed; exclude Strokes / Regina Spektor tracks.
-//
-// Graph size: run in Python: python recommendations.py (prints counts + top 5)
+// Same as RECOMMEND_QUERY in recommendations.py — run in Browser or cypher-shell -f
 
 MATCH (seed:Song)
 WHERE toLower(seed.artists) CONTAINS 'the strokes'
