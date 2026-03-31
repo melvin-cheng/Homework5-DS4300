@@ -1,0 +1,24 @@
+# Secrets — copy env.example to .env locally
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Optional: large local datasets (uncomment if you do not commit CSVs)
+# spotify.csv

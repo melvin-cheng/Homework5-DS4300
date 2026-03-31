@@ -1,14 +1,19 @@
+import os
+
 import pandas as pd
+from dotenv import load_dotenv
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MinMaxScaler
 
-SPOTIFY_CSV = "spotify.csv"      
-SAMPLE_SIZE = 2000          
-SIMILARITY_THRESHOLD = 0.99     
-NEO4J_URI = "neo4j://127.0.0.1:7687"
-NEO4J_USER = "neo4j"
-NEO4J_PASSWORD = "melvincheng06"
+load_dotenv()
+
+SPOTIFY_CSV = os.getenv("SPOTIFY_CSV", "spotify.csv")
+SAMPLE_SIZE = int(os.getenv("SAMPLE_SIZE", "2000"))
+SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.99"))
+NEO4J_URI = os.getenv("NEO4J_URI", "neo4j://127.0.0.1:7687")
+NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
  
 # Audio features
 FEATURES = [
@@ -63,6 +68,7 @@ def create_nodes(df):
                 MERGE (s:Song {id: $id})
                 SET s.name = $name,
                     s.artists = $artists,
+                    s.album = $album,
                     s.genre = $genre,
                     s.danceability = $danceability,
                     s.energy = $energy,
@@ -77,6 +83,7 @@ def create_nodes(df):
                 id=row["track_id"],
                 name=row["track_name"],
                 artists=row["artists"],
+                album=row["album_name"],
                 genre=row["track_genre"],
                 danceability=row["danceability"],
                 energy=row["energy"],
@@ -146,6 +153,9 @@ def create_constraints(session):
     print("Constraint created on Song.id.")
 
 def main():
+    if not NEO4J_PASSWORD:
+        raise SystemExit("Set NEO4J_PASSWORD in .env or the environment.")
+
     # Load and preprocess data
     df = load_and_sample(SPOTIFY_CSV, SAMPLE_SIZE)
     df = normalize_features(df, FEATURES)
